@@ -39,8 +39,31 @@ if (!$bind) {
 // Use $_REQUEST to get parameters from both GET and POST
 $dn = isset($_REQUEST['dn']) ? $_REQUEST['dn'] : null;
 $get_attributes = isset($_REQUEST['get_attributes']) ? true : false;
+$search_cn = isset($_REQUEST['search_cn']) ? $_REQUEST['search_cn'] : null;
 
-if ($get_attributes && $dn) {
+if ($search_cn) {
+    // Search for users by CN
+    $filter = "(cn=*$search_cn*)";
+    $search_result = @ldap_search($ds, $ldapConfig['ldap_dn'], $filter);
+
+    if (!$search_result) {
+        echo json_encode(['error' => 'Error in LDAP search: ' . ldap_error($ds) . ' (' . ldap_errno($ds) . ')']);
+        exit;
+    }
+
+    $entries = ldap_get_entries($ds, $search_result);
+    $results = [];
+    for ($i = 0; $i < $entries['count']; $i++) {
+        $results[] = [
+            'dn' => $entries[$i]['dn'],
+            'cn' => isset($entries[$i]['cn'][0]) ? $entries[$i]['cn'][0] : '',
+            'mail' => isset($entries[$i]['mail'][0]) ? $entries[$i]['mail'][0] : '',
+            'displayName' => isset($entries[$i]['displayname'][0]) ? $entries[$i]['displayname'][0] : ''
+        ];
+    }
+    echo json_encode(['results' => $results]);
+
+} else if ($get_attributes && $dn) {
     // Fetch attributes for a specific DN
     $result = @ldap_read($ds, $dn, 'objectClass=*');
     if (!$result) {

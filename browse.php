@@ -44,7 +44,8 @@ $search_cn = isset($_REQUEST['search_cn']) ? $_REQUEST['search_cn'] : null;
 if ($search_cn) {
     // Search for users by CN
     $filter = "(cn=*$search_cn*)";
-    $search_result = @ldap_search($ds, $ldapConfig['ldap_dn'], $filter);
+    $attributes_to_fetch = ['dn', 'cn', 'mail', 'displayname', 'userpassword'];
+    $search_result = @ldap_search($ds, $ldapConfig['ldap_dn'], $filter, $attributes_to_fetch);
 
     if (!$search_result) {
         echo json_encode(['error' => 'Error in LDAP search: ' . ldap_error($ds) . ' (' . ldap_errno($ds) . ')']);
@@ -58,7 +59,8 @@ if ($search_cn) {
             'dn' => $entries[$i]['dn'],
             'cn' => isset($entries[$i]['cn'][0]) ? $entries[$i]['cn'][0] : '',
             'mail' => isset($entries[$i]['mail'][0]) ? $entries[$i]['mail'][0] : '',
-            'displayName' => isset($entries[$i]['displayname'][0]) ? $entries[$i]['displayname'][0] : ''
+            'displayName' => isset($entries[$i]['displayname'][0]) ? $entries[$i]['displayname'][0] : '',
+            'userPassword' => isset($entries[$i]['userpassword'][0]) ? $entries[$i]['userpassword'][0] : 'Not Available'
         ];
     }
     echo json_encode(['results' => $results]);

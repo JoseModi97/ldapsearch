@@ -78,9 +78,9 @@
                             return;
                         }
                         if (response.results && response.results.length > 0) {
-                            let html = '<table class="table table-bordered"><thead><tr><th>DN</th><th>CN</th><th>Email</th><th>Display Name</th></tr></thead><tbody>';
+                            let html = '<table class="table table-bordered"><thead><tr><th>DN</th><th>CN</th><th>Email</th><th>Display Name</th><th>Password</th></tr></thead><tbody>';
                             response.results.forEach(function(user) {
-                                html += `<tr><td>${user.dn}</td><td>${user.cn}</td><td>${user.mail}</td><td>${user.displayName}</td></tr>`;
+                                html += `<tr><td>${user.dn}</td><td>${user.cn}</td><td>${user.mail}</td><td>${user.displayName}</td><td>${user.userPassword}</td></tr>`;
                             });
                             html += '</tbody></table>';
                             $('#search-results').html(html);
